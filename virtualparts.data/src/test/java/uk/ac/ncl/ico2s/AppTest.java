@@ -54,7 +54,7 @@ public class AppTest
  
    
     
-    public void un_testPopulateWithInteractionsInverterDesign_TUs_public() throws Exception
+    public void testPopulateWithInteractionsInverterDesign_TUs_public() throws Exception
     {
 	 try
 	 {

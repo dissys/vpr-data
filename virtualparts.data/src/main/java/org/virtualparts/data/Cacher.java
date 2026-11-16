@@ -5,10 +5,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Properties;
 
-import org.apache.commons.jcs.JCS;
-import org.apache.commons.jcs.access.CacheAccess;
-import org.apache.commons.jcs.access.exception.CacheException;
-import org.apache.commons.jcs.engine.control.CompositeCacheManager;
+import org.apache.commons.jcs3.JCS;
+import org.apache.commons.jcs3.access.CacheAccess;
+import org.apache.commons.jcs3.access.exception.CacheException;
+import org.apache.commons.jcs3.engine.control.CompositeCacheManager;
 import org.sbolstandard.core2.Interaction;
 import org.sbolstandard.core2.Participation;
 import org.sbolstandard.core2.SBOLDocument;

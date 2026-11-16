@@ -6,6 +6,7 @@ import java.net.URI;
 
 import javax.xml.namespace.QName;
 
+
 import org.sbolstandard.core2.SystemsBiologyOntology;
 
 import org.sbolstandard.core.datatree.NamespaceBinding;
