@@ -212,7 +212,9 @@ public class RDFHandler {
 			writer.write(this.model, stream, this.baseUri);*/
 			
 			RDFFormat jenaFormat = RDFFormat.RDFXML_ABBREV;
-			if (format.equalsIgnoreCase("RDF/XML") || format.equalsIgnoreCase("RDF/XML-ABBREV")) {
+			if (format.equalsIgnoreCase("RDF/XML")) {
+				jenaFormat = RDFFormat.RDFXML_PLAIN;
+			} else if (format.equalsIgnoreCase("RDF/XML-ABBREV")) {
 				jenaFormat = RDFFormat.RDFXML_PRETTY;
 			} else if (format.equalsIgnoreCase("TURTLE") || format.equalsIgnoreCase("TURTLE-PRETTY")) {
 				jenaFormat = RDFFormat.TURTLE_PRETTY;

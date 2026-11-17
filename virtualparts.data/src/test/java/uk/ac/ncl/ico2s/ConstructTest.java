@@ -13,6 +13,7 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.exec.http.QueryExecutionHTTP;
+import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
 import org.apache.jena.sparql.exec.http.QuerySendMode;
 import org.sbolstandard.core2.SBOLDocument;
 import org.sbolstandard.core2.SBOLReader;
@@ -30,35 +31,31 @@ import junit.framework.TestSuite;
 /**
  * Unit test for simple App.
  */
-public class ConstructTest  extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public ConstructTest( String testName )
-    {
-        super( testName );
-    }
+public class ConstructTest extends TestCase {
+	/**
+	 * Create the test case
+	 *
+	 * @param testName name of the test case
+	 */
+	public ConstructTest(String testName) {
+		super(testName);
+	}
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( ConstructTest.class );
-    }
+	/**
+	 * @return the suite of tests being tested
+	 */
+	public static Test suite() {
+		return new TestSuite(ConstructTest.class);
+	}
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testConstruct()
-    {
-       // 2️⃣ Your CONSTRUCT query
-       String sparqlQuery = "CONSTRUCT {?s ?p ?o} WHERE {?s ?p ?o .} LIMIT 1";
+	/**
+	 * Rigourous Test :-)
+	 */
+	public void testConstruct() {
+		// 2️⃣ Your CONSTRUCT query
+		String sparqlQuery = "CONSTRUCT {?s ?p ?o} WHERE {?s ?p ?o .} LIMIT 1";
 
-	   String sparqlQuery2="PREFIX sbol2: <http://sbols.org/v2#>\r\n" + //
+		String sparqlQuery2 = "PREFIX sbol2: <http://sbols.org/v2#>\r\n" + //
 				"PREFIX biopax: <http://www.biopax.org/release/biopax-level3.owl#>\r\n" + //
 				"PREFIX dcterms: <http://purl.org/dc/terms/>\r\n" + //
 				"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n" + //
@@ -121,64 +118,45 @@ public class ConstructTest  extends TestCase
 				"    FILTER (?IntereactionProperty != sbol2:participation)  \r\n" + //
 				"  } \r\n" + //
 				"}\r\n" + //
-				"\r\n" ;
-				
+				"\r\n";
 
-				Query query = QueryFactory.create(sparqlQuery2);
-
-try (QueryExecution qexec =
-     QueryExecutionHTTP.service(endpoint)
-                        .query(query).sendMode(QuerySendMode.asPostForm)                    
-                        .build()) {
-
-    Model model = qexec.execConstruct();
-    model.write(System.out, "TURTLE");
-}
-
-
-		/* Did not work
-		Query query = QueryFactory.create(sparqlQuery2);
-		try (QueryExecution qexec =
-        QueryExecutionHTTP
-            .service(endpoint)
-            .query(sparqlQuery2)
-			.postQuery()
-            .build()) {
-			Model model = qexec.execConstruct();
-			model.write(System.out, "TURTLE");
-		}*/
-
-
-/* 			
 		Query query = QueryFactory.create(sparqlQuery2);
 
-		try (QueryExecution qexec =
-				QueryExecutionHTTP.service(endpoint)
-								.query(query)
-								.build()) {
+		QueryExecutionHTTPBuilder builder = QueryExecutionHTTP.service(endpoint).query(query).sendMode(QuerySendMode.asPostForm);
+		// SynBioHub requires a login token for SPARQL queries
+		String token = TestUtils.getToken();
+		if (token != null && !token.isEmpty()) {
+			builder.httpHeader("X-authorization", token);
+		}
+
+		try (QueryExecution qexec = builder.build()) {
 
 			Model model = qexec.execConstruct();
 			model.write(System.out, "TURTLE");
 		}
-*/
-		
-		/* 
 
-        // 4️⃣ Execute the query using try-with-resources
-        try (QueryExecutionHTTP qexec = QueryExecutionHTTP.service(endpoint, sparqlQuery2)) {
-                   	
-            Model model = qexec.execConstruct();
+		/*
+		 * Did not work Query query = QueryFactory.create(sparqlQuery2); try (QueryExecution qexec = QueryExecutionHTTP .service(endpoint) .query(sparqlQuery2) .postQuery() .build()) { Model model = qexec.execConstruct(); model.write(System.out, "TURTLE"); }
+		 */
 
-            // 6️⃣ Print the model in Turtle format
-            model.write(System.out, "TURTLE");
-        }
-		*/
-    }
- 
-   
-    
-        
-    public static String endpoint="https://synbiohub.org/sparql";
-    
-    
+		/*
+		 * Query query = QueryFactory.create(sparqlQuery2);
+		 * 
+		 * try (QueryExecution qexec = QueryExecutionHTTP.service(endpoint) .query(query) .build()) {
+		 * 
+		 * Model model = qexec.execConstruct(); model.write(System.out, "TURTLE"); }
+		 */
+
+		/*
+		 * 
+		 * // Execute the query using try-with-resources try (QueryExecutionHTTP qexec = QueryExecutionHTTP.service(endpoint, sparqlQuery2)) {
+		 * 
+		 * Model model = qexec.execConstruct();
+		 * 
+		 * // Print the model in Turtle format model.write(System.out, "TURTLE"); }
+		 */
+	}
+
+	public static String endpoint = "https://synbiohub.org/sparql";
+
 }

@@ -1,119 +1,110 @@
-<?xml version="1.0"?>
-<project
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>org.virtualparts</groupId>
-		<artifactId>virtualparts-parent</artifactId>
-		<version>2.0.18-SNAPSHOT</version>
-	</parent>
-	<artifactId>virtualparts-data</artifactId>
-	<name>virtualparts-data</name>
-	<url>http://maven.apache.org</url>
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.9</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.sbolstandard</groupId>
-			<artifactId>libSBOLj</artifactId>
-			<version>2.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.virtualparts</groupId>
-			<artifactId>virtualparts-rdf</artifactId>
-			<version>2.0.18-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.jena</groupId>
-			<artifactId>jena-base</artifactId>
-			<version>5.6.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.jena</groupId>
-			<artifactId>jena-arq</artifactId>
-			<version>5.6.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.jena</groupId>
-			<artifactId>jena-core</artifactId>
-			<version>5.6.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.virtualparts</groupId>
-			<artifactId>virtualparts-sbol</artifactId>
-			<version>2.0.18-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.21.0</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-jcs3-core -->
-		<dependency>
-		    <groupId>org.apache.commons</groupId>
-		    <artifactId>commons-jcs3-core</artifactId>
-		    <version>3.2.1</version>
-		</dependency>
-	</dependencies>
-	<build>
-	
-	<plugins>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <!-- SHADE PLUGIN (fat JAR) -->
-    <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.5.2</version>
-        <executions>
-            <execution>
-                <phase>package</phase>
-                <goals>
-                    <goal>shade</goal>
-                </goals>
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.virtualparts</groupId>
+        <artifactId>virtualparts-parent</artifactId>
+        <version>2.0.18-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>virtualparts-data</artifactId>
+
+    <name>virtualparts-data</name>
+
+    <!-- Versions are managed in the parent POM -->
+    <dependencies>
+        <dependency>
+            <groupId>org.virtualparts</groupId>
+            <artifactId>virtualparts-rdf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.virtualparts</groupId>
+            <artifactId>virtualparts-sbol</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.sbolstandard</groupId>
+            <artifactId>libSBOLj</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-arq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-jcs3-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Shaded jar with dependencies; base configuration is in the parent POM -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>with-dependencies</shadedClassifierName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Additional jar-with-dependencies -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <createDependencyReducedPom>true</createDependencyReducedPom>
-                    <shadedArtifactAttached>true</shadedArtifactAttached>
-                    <shadedClassifierName>with-dependencies</shadedClassifierName>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
                 </configuration>
-            </execution>
-        </executions>
-    </plugin>
-
-    <!-- ASSEMBLY PLUGIN (optional extra jar-with-dependencies) -->
-    <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.6.0</version>
-        <configuration>
-            <archive>
-                <manifest>
-                    <addClasspath>true</addClasspath>
-                </manifest>
-            </archive>
-            <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-            </descriptorRefs>
-        </configuration>
-        <executions>
-            <execution>
-                <id>make-assembly</id>
-                <phase>package</phase>
-                <goals>
-                    <goal>single</goal>
-                </goals>
-            </execution>
-        </executions>
-    </plugin>
-
-</plugins>
-
-	
-	</build>
-
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

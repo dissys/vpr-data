@@ -4,46 +4,53 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.exec.http.QueryExecutionHTTP;
+import org.apache.jena.sparql.exec.http.QueryExecutionHTTPBuilder;
+import org.apache.jena.sparql.exec.http.QuerySendMode;
 import org.virtualparts.VPRException;
 import org.virtualparts.rdf.RDFHandler;
 
 public class TripleStoreHandler {
 	private String endPointURL;
+	private String token;
 
-	public TripleStoreHandler(String endPointURL) {
+	public TripleStoreHandler(String endPointURL, String token) {
 		this.endPointURL = endPointURL;
+		this.token = token;
+	}
+
+	/**
+	 * Creates an HTTP query execution for the endpoint. If a token is provided, it is sent
+	 * in the X-authorization header so that private stores can be queried after login.
+	 */
+	private QueryExecution createQueryExecution(String sparqlQuery, Syntax syntax, String token) {
+		// Long queries are sent as an HTML form POST: SynBioHub does not accept the query as a
+		// POST body (application/sparql-query), which is Jena's default for queries over the GET limit.
+		QueryExecutionHTTPBuilder builder = QueryExecutionHTTP.service(this.endPointURL)
+				.sendMode(QuerySendMode.asGetWithLimitForm);
+		if (token != null && !token.isEmpty()) {
+			builder.httpHeader("X-authorization", token);
+		}
+		return syntax == null ? builder.query(sparqlQuery).build() : builder.query(sparqlQuery, syntax).build();
 	}
 	    
-	public ResultSet executeSparql(String sparqlQuery)  throws VPRException{
-		try
+	public ResultSet executeSparql(String sparqlQuery, String token)  throws VPRException{
+		try (QueryExecution qexec = createQueryExecution(sparqlQuery, null, token))
 		{
-			//Query query = QueryFactory.create(sparqlQuery, Syntax.syntaxSPARQL_11);
-
-			//QueryEngineHTTP httpQuery = new QueryEngineHTTP (this.endPointURL, sparqlQuery);
-			//ResultSet results = httpQuery.execSelect();	
-			QueryExecution qexec = QueryExecutionHTTP.service(this.endPointURL, sparqlQuery);
-			ResultSet results = qexec.execSelect();			
-		/*
-		 * while (results.hasNext()) { QuerySolution solution = results.next();
-		 * // get the value of the variables in the select clause String
-		 * expressionValue = solution.get("Component").toString();
-		 * System.out.println(expressionValue); }
-		 */
-		return results;
+			// Copy the results into memory before the HTTP connection is closed.
+			return ResultSetFactory.copyResults(qexec.execSelect());
 		}
 		catch (Exception e)
 		{
@@ -51,17 +58,13 @@ public class TripleStoreHandler {
 		}
 	}
 	
-	public String executeSparqlWithJson(String sparqlQuery)  throws VPRException{
+	public String executeSparqlWithJson(String sparqlQuery, String token)  throws VPRException{
 		try
-		{			
-			/*QueryEngineHTTP httpQuery = new QueryEngineHTTP (this.endPointURL, sparqlQuery);
-			ResultSet results = httpQuery.execSelect();*/
-			QueryExecution qexec = QueryExecutionHTTP.service(this.endPointURL, sparqlQuery);
-			ResultSet results = qexec.execSelect();	
+		{
+			ResultSet results = executeSparql(sparqlQuery, token);
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 			ResultSetFormatter.outputAsJSON(outputStream, results);
-			String json = new String(outputStream.toByteArray());		
-			return json;
+			return new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
 		}
 		catch (Exception e)
 		{
@@ -69,12 +72,13 @@ public class TripleStoreHandler {
 		}
 	}
 	
-	public String executeConstructSparql(String sparqlQuery) throws VPRException {
+	public String executeConstructSparql(String sparqlQuery, String token) throws VPRException {
 		try
 		{
-			Model model=executeConstructSparqlAsModel(sparqlQuery);
+			Model model=executeConstructSparqlAsModel(sparqlQuery, token);
 			RDFHandler rdfHandler=new RDFHandler(model);
-			return rdfHandler.getRdfString(null, null);
+			// Plain (non-nested) RDF/XML, as libSBOLj reads it reliably
+			return rdfHandler.getRdfString(getDefaultFormat(), null);
 		}
 		catch (Exception e)
 		{
@@ -82,42 +86,15 @@ public class TripleStoreHandler {
 		}		
 	}
 	
-	public Model executeConstructSparqlAsModel(String sparqlQuery) throws VPRException {
-		// we want to bind the ?uniprotAccession variable in the query
-		// to the URI for Q16850 which is http://purl.uniprot.org/uniprot/Q16850
-		// QuerySolutionMap querySolutionMap = new QuerySolutionMap();
-		// querySolutionMap.add("uniprotAccession", new
-		// ResourceImpl("http://purl.uniprot.org/uniprot/Q16850"));
-		// ParameterizedSparqlString parameterizedSparqlString = new
-		// ParameterizedSparqlString(query.toString(), querySolutionMap);
-
-		//QueryEngineHTTP httpQuery = new QueryEngineHTTP (this.endPointURL, query);
-		//Model model= httpQuery.execConstruct();
-
-		Query query = QueryFactory.create(sparqlQuery, Syntax.syntaxSPARQL_11);
-		QueryExecutionHTTP qexec = QueryExecutionHTTP.service(this.endPointURL, query);
-		Model model = qexec.execConstruct();
-
-		/*Model model=null;
-		Query query = QueryFactory.create(sparqlQuery, Syntax.syntaxSPARQL_11);
-		try (QueryExecutionHTTP qexec = QueryExecutionHTTP.service(this.endPointURL, query)) {
-    		model = qexec.execConstruct();  // Executes the CONSTRUCT query    	
-		}
-		catch(Exception e)
+	public Model executeConstructSparqlAsModel(String sparqlQuery, String token) throws VPRException {
+		try (QueryExecution qexec = createQueryExecution(sparqlQuery, Syntax.syntaxSPARQL_11, token))
 		{
-			e.printStackTrace();
-			throw new VPRException("Could not execute the CONSTRUCT query. " + sparqlQuery +  "\r\n" +e.getMessage(),e);
-		}*/
-
-
-		
-		/*
-		 * while (results.hasNext()) { QuerySolution solution = results.next();
-		 * // get the value of the variables in the select clause String
-		 * expressionValue = solution.get("Component").toString();
-		 * System.out.println(expressionValue); }
-		 */
-		return model;
+			return qexec.execConstruct();
+		}
+		catch (Exception e)
+		{
+			throw new VPRException("Could not execute the CONSTRUCT query. " + e.getMessage() + "\nQuery:\n" + sparqlQuery, e);
+		}
 	}
 	
 	/*public String getRdfString(Model model, String format, Resource[] topLevelResources)
@@ -173,7 +150,7 @@ public class TripleStoreHandler {
     	}*/
 		try
 		{
-			InputStream stream= new TripleStoreHandler("").getClass().getClassLoader().getResourceAsStream(fileName);
+			InputStream stream= new TripleStoreHandler("","").getClass().getClassLoader().getResourceAsStream(fileName);
 	    	StringWriter writer = new StringWriter();
 	    	IOUtils.copy(stream, writer);
 	    	String sparql = writer.toString();
