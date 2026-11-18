@@ -19,9 +19,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-              <createDependencyReducedPom>true</createDependencyReducedPom>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
-              <shadedClassifierName>with-dependencies</shadedClassifierName>
+              <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-with-dependencies.jar</outputFile>
             </configuration>
           </execution>
         </executions>
@@ -38,6 +36,7 @@
           </execution>
         </executions>
         <configuration>
+          <attach>false</attach>
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>

@@ -136,7 +136,9 @@
                     </configuration>
                 </plugin>
 
-                <!-- Creates a jar with dependencies -->
+                <!-- Creates a jar with dependencies in target/ during mvn package. Because outputFile
+                     is set, the jar is not attached: it is neither installed nor deployed, and the
+                     project POM keeps all its dependencies (no dependency-reduced POM). -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
@@ -150,28 +152,23 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <shadedArtifactAttached>true</shadedArtifactAttached>
-                        <shadedClassifierName>withDependencies</shadedClassifierName>
+                        <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-withDependencies.jar</outputFile>
+                        <!-- Keep the full POM: a reduced POM would drop the dependencies for Maven users -->
+                        <createDependencyReducedPom>false</createDependencyReducedPom>
                     </configuration>
                 </plugin>
 
-                <!-- Creates an additional jar-with-dependencies (configured in virtualparts.data) -->
+                <!-- Publishes to Maven Central through the Central Portal (central.sonatype.com).
+                     SNAPSHOT versions go to the Central snapshot repository. Releases are uploaded
+                     for validation and published manually from the portal (autoPublish=false). -->
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.8.0</version>
-                </plugin>
-
-                <!-- Nexus staging plugin -->
-                <plugin>
-                    <groupId>org.sonatype.plugins</groupId>
-                    <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>1.7.0</version>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>0.12.0</version>
                     <extensions>true</extensions>
                     <configuration>
-                        <serverId>ossrh</serverId>
-                        <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                        <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                        <publishingServerId>central</publishingServerId>
+                        <autoPublish>false</autoPublish>
                     </configuration>
                 </plugin>
 
@@ -185,6 +182,14 @@
             </plugins>
         </pluginManagement>
 
+        <plugins>
+            <!-- Replaces the default deploy step in all modules -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -192,13 +197,6 @@
             </resource>
         </resources>
     </build>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <profiles>
         <profile>

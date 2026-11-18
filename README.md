@@ -1,3 +1,25 @@
+# Usage
+
+Update your project's POM file as follows to use a SNAPSHOT version.
+
+```xml
+<repositories>
+    <repository>
+        <id>central-snapshots</id>
+        <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        <releases><enabled>false</enabled></releases>
+        <snapshots><enabled>true</enabled></snapshots>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>org.virtualparts</groupId>
+        <artifactId>virtualparts-data</artifactId>
+        <version>2.0.18-SNAPSHOT</version>
+    </dependency>
+</dependencies>
+```
 # vpr-data
 
 Release 2.0.18 - Added the token use for the SPARQL endpoints. Updated the dependencies.
@@ -25,7 +47,9 @@ Some SPARQL endpoints, such as https://synbiohub.org/sparql, require a login tok
 curl -X POST -H "Accept: text/plain" --data-urlencode "email=EMAIL" --data-urlencode "password=PWD" https://synbiohub.org/login
 ```
 
-**2. Set the environment variable** (replace `TOKEN` with the token from step 1):
+**2. Set the environment variable**
+
+Replace `TOKEN` with the token from step 1):
 
 - macOS / Linux:
   ```
@@ -38,14 +62,24 @@ Then type the following to print the first few characters for verification:
 ```
 echo ${SYNBIOHUB_TOKEN:0:8}
 ```
-**3. Restart your terminal and IDE** so that they pick up the variable. 
+**3. Restart your terminal and IDE**
+
+This ensures accessing the environment variable. 
 
 To keep the VSCode is open, you can try this from the VSCode terminal. Not guaranteed to work, it seems to work for me!
 ```
 launchctl setenv SYNBIOHUB_TOKEN "$SYNBIOHUB_TOKEN"
 ```
 
+Or try restarting it:
+'''
+code ~/work/vs_workspace/{YOUR_VSCODE_WORKSPACE}
+'''
+
 Alternatively, pass the token to Maven directly:
 ```
 mvn test -Dsynbiohub.token=TOKEN
 ```
+
+## Publishing to Maven
+See [maven.md](maven.md) for how to publish SNAPSHOT versions to Maven Central.
