@@ -1,125 +1,224 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.virtualparts</groupId>
-	<artifactId>virtualparts-parent</artifactId>
-	<version>2.0.17-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<name>Virtual Parts</name>
-	<description>Libraries and applications for the Virtual Parts Repository</description>
-	<url>https://github.com/ico2s/vpr-data</url>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<issueManagement>
-		<system>GitHub Issues</system>
-		<url>https://github.com/ico2s/vpr-data/issues</url>
-	</issueManagement>
+    <modelVersion>4.0.0</modelVersion>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-	
-    
+    <groupId>org.virtualparts</groupId>
+    <artifactId>virtualparts-parent</artifactId>
+    <version>2.0.18-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-	<modules>
-		<module>virtualparts.sbol</module>
-		<module>virtualparts.rdf</module>
-		<module>virtualparts.data</module>
-	</modules>
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<!-- settings for javac. -->
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<configuration>
-						<source>1.7</source>
-						<target>1.7</target>
-						<showDeprecation>true</showDeprecation>
-					</configuration>
-				</plugin>
-				<plugin>
-					<!-- Create a jar file with the dependencies -->
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-shade-plugin</artifactId>
-					<version>2.1</version>
-					<executions>
-						<execution>
-							<phase>package</phase>
-							<goals>
-								<goal>shade</goal>
-							</goals>
-						</execution>
-					</executions>
-					<configuration>
-						<shadedArtifactAttached>true</shadedArtifactAttached>
-						<shadedClassifierName>withDependencies</shadedClassifierName>
-					</configuration>
-				</plugin>
+    <name>Virtual Parts</name>
+    <description>Libraries and applications for the Virtual Parts Repository</description>
+    <url>https://github.com/ico2s/vpr-data</url>
 
-				<plugin>
-					<groupId>org.sonatype.plugins</groupId>
-					<artifactId>nexus-staging-maven-plugin</artifactId>
-					<version>1.6.2</version>
-					<extensions>true</extensions>
-					<configuration>
-						<serverId>ossrh</serverId>
-						<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-						<autoReleaseAfterClose>false</autoReleaseAfterClose>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/ico2s/vpr-data/issues</url>
+    </issueManagement>
 
-		<resources>
-			<resource>
-				<!-- Enable substitution of ${foo} maven variables in resource files. -->
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-	</build>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>23</maven.compiler.release>
 
-	<dependencyManagement>
-		<dependencies>
-			<!-- test dependencies -->
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.9</version>
-				<scope>test</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+        <!-- Dependency versions -->
+        <jena.version>5.6.0</jena.version>
+        <libsbolj.version>2.4.0</libsbolj.version>
+        <commons-io.version>2.22.0</commons-io.version>
+        <commons-collections4.version>4.6.0</commons-collections4.version>
+        <commons-jcs3.version>3.2.1</commons-jcs3.version>
+        <jakarta.ws.rs.version>4.0.0</jakarta.ws.rs.version>
+        <httpclient.version>4.5.14</httpclient.version>
+        <junit.version>4.13.2</junit.version>
+        <slf4j.version>2.0.17</slf4j.version>
+    </properties>
 
-	<profiles>
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+    <modules>
+        <module>virtualparts.rdf</module>
+        <module>virtualparts.sbol</module>
+        <module>virtualparts.data</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Project modules -->
+            <dependency>
+                <groupId>org.virtualparts</groupId>
+                <artifactId>virtualparts-rdf</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.virtualparts</groupId>
+                <artifactId>virtualparts-sbol</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- Third-party libraries -->
+            <dependency>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-base</artifactId>
+                <version>${jena.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-core</artifactId>
+                <version>${jena.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.jena</groupId>
+                <artifactId>jena-arq</artifactId>
+                <version>${jena.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.sbolstandard</groupId>
+                <artifactId>libSBOLj</artifactId>
+                <version>${libsbolj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections4.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-jcs3-core</artifactId>
+                <version>${commons-jcs3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.ws.rs</groupId>
+                <artifactId>jakarta.ws.rs-api</artifactId>
+                <version>${jakarta.ws.rs.version}</version>
+            </dependency>
+            <!-- Overrides httpclient 4.5.1 from libSBOLj -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+
+            <!-- Testing -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- Silences SLF4J's "No SLF4J providers" warnings in tests; not passed on to users -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-nop</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+
+                <!-- Java compiler; the Java version is set by maven.compiler.release -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.16.0</version>
+                    <configuration>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                        <showDeprecation>true</showDeprecation>
+                        <showWarnings>true</showWarnings>
+                    </configuration>
+                </plugin>
+
+                <!-- Creates a jar with dependencies in target/ during mvn package. Because outputFile
+                     is set, the jar is not attached: it is neither installed nor deployed, and the
+                     project POM keeps all its dependencies (no dependency-reduced POM). -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.6.2</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>shade</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-withDependencies.jar</outputFile>
+                        <!-- Keep the full POM: a reduced POM would drop the dependencies for Maven users -->
+                        <createDependencyReducedPom>false</createDependencyReducedPom>
+                    </configuration>
+                </plugin>
+
+                <!-- Publishes to Maven Central through the Central Portal (central.sonatype.com).
+                     SNAPSHOT versions go to the Central snapshot repository. Releases are uploaded
+                     for validation and published manually from the portal (autoPublish=false). -->
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>0.12.0</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <publishingServerId>central</publishingServerId>
+                        <autoPublish>false</autoPublish>
+                    </configuration>
+                </plugin>
+
+                <!-- Signs artifacts in the release profile -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>3.2.8</version>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <!-- Replaces the default deploy step in all modules -->
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

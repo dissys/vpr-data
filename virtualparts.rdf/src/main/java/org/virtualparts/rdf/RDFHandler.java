@@ -27,16 +27,18 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.RDFWriter;
 import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.riot.RDFFormat;
+import org.apache.jena.riot.RDFWriter;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
+
 
 public class RDFHandler {
 	private Model model = null;
@@ -200,15 +202,37 @@ public class RDFHandler {
 			format = getDefaultFormat();
 		}
 		try {
-			RDFWriter writer = this.model.getWriter(format);
+			/*RDFWriter writer = this.model.getWriter(format);
 			// fasterWriter.setProperty("allowBadURIs","true");
 			// fasterWriter.setProperty("relativeURIs","");
 			writer.setProperty("tab", "3");
 			if (topLevelResources != null && topLevelResources.length > 0) {
 				writer.setProperty("prettyTypes", topLevelResources);
 			}
-			writer.write(this.model, stream, this.baseUri);
+			writer.write(this.model, stream, this.baseUri);*/
+			
+			RDFFormat jenaFormat = RDFFormat.RDFXML_ABBREV;
+			if (format.equalsIgnoreCase("RDF/XML")) {
+				jenaFormat = RDFFormat.RDFXML_PLAIN;
+			} else if (format.equalsIgnoreCase("RDF/XML-ABBREV")) {
+				jenaFormat = RDFFormat.RDFXML_PRETTY;
+			} else if (format.equalsIgnoreCase("TURTLE") || format.equalsIgnoreCase("TURTLE-PRETTY")) {
+				jenaFormat = RDFFormat.TURTLE_PRETTY;
+			} else if (format.equalsIgnoreCase("NTRIPLES")) {
+				jenaFormat = RDFFormat.NTRIPLES;
+			} else {
+				throw new IllegalArgumentException("Unsupported format: " + format);
+			}
+
+			RDFWriter.create()
+		        .source(this.model)
+		        .format(jenaFormat)
+		        .base(this.baseUri)
+		        .output(stream);
+			
 			rdfData = new String(stream.toString());
+		
+			
 		} finally {
 			if (stream != null) {
 				stream.close();
@@ -374,7 +398,7 @@ public class RDFHandler {
 	     */
 	    public static MultivaluedMap<String,String> resultsToMultiValuedMap(ResultSet rs)
 	    {
-	    	MultivaluedMap<String,String> results=new MultivaluedHashMap<>();
+	    	MultivaluedMap<String,String> results=new MultivaluedHashMap<String, String>();
 	    	int count=0;
 
 	        String name=rs.getResultVars().get(0);
