@@ -7,16 +7,37 @@
 
     <groupId>org.virtualparts</groupId>
     <artifactId>virtualparts-parent</artifactId>
-    <version>2.0.18-SNAPSHOT</version>
+    <version>2.0.18</version>
     <packaging>pom</packaging>
 
     <name>Virtual Parts</name>
     <description>Libraries and applications for the Virtual Parts Repository</description>
-    <url>https://github.com/ico2s/vpr-data</url>
+    <url>https://github.com/dissys/vpr-data</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Goksel Misirli</name>
+            <url>https://github.com/dissys</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/dissys/vpr-data</url>
+        <connection>scm:git:https://github.com/dissys/vpr-data.git</connection>
+        <developerConnection>scm:git:git@github.com:dissys/vpr-data.git</developerConnection>
+    </scm>
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/ico2s/vpr-data/issues</url>
+        <url>https://github.com/dissys/vpr-data/issues</url>
     </issueManagement>
 
     <properties>
@@ -136,9 +157,7 @@
                     </configuration>
                 </plugin>
 
-                <!-- Creates a jar with dependencies in target/ during mvn package. Because outputFile
-                     is set, the jar is not attached: it is neither installed nor deployed, and the
-                     project POM keeps all its dependencies (no dependency-reduced POM). -->
+                <!-- Creates a jar with dependencies in target during mvn package-->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
@@ -153,14 +172,12 @@
                     </executions>
                     <configuration>
                         <outputFile>${project.build.directory}/${project.artifactId}-${project.version}-withDependencies.jar</outputFile>
-                        <!-- Keep the full POM: a reduced POM would drop the dependencies for Maven users -->
+                        <!-- Keep the full POM not to drop the dependencies for Maven users -->
                         <createDependencyReducedPom>false</createDependencyReducedPom>
                     </configuration>
                 </plugin>
 
-                <!-- Publishes to Maven Central through the Central Portal (central.sonatype.com).
-                     SNAPSHOT versions go to the Central snapshot repository. Releases are uploaded
-                     for validation and published manually from the portal (autoPublish=false). -->
+                <!-- Releases to  Maven Central (central.sonatype.com), and SNAPSHOTs to the Central snapshot repository. -->
                 <plugin>
                     <groupId>org.sonatype.central</groupId>
                     <artifactId>central-publishing-maven-plugin</artifactId>
@@ -168,6 +185,7 @@
                     <extensions>true</extensions>
                     <configuration>
                         <publishingServerId>central</publishingServerId>
+                        <!-- To publish releases manually from the portal -->
                         <autoPublish>false</autoPublish>
                     </configuration>
                 </plugin>
@@ -177,6 +195,18 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
                     <version>3.2.8</version>
+                </plugin>
+
+                <!-- Source and Javadoc jars, required by Maven Central for releases -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.3.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.11.2</version>
                 </plugin>
 
             </plugins>
@@ -203,6 +233,36 @@
             <id>release</id>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <!-- Report Javadoc problems as warnings instead of failing the release -->
+                            <doclint>none</doclint>
+                            <failOnError>false</failOnError>
+                            <quiet>true</quiet>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
