@@ -1,5 +1,5 @@
-# Publishing SNAPSHOTs to Maven Central
-SNAPSHOTs are published at https://central.sonatype.com. Please note that SNAPSHOTs are for testing only and are deleted after 90 days.
+# Publishing to Maven Central
+Start with the SNAPSHOT. SNAPSHOTs are published at https://central.sonatype.com. Please note that SNAPSHOTs are for testing only and are deleted after 90 days.
 
 
 ## 1. Set up the namespace (once)
@@ -119,6 +119,120 @@ https://central.sonatype.com/repository/maven-snapshots/org/virtualparts/virtual
 ```
 
 
-## Releases
+## Publishing a release
 
-Publishing a release (for example `2.0.18`) additionally requires GPG signatures, source and Javadoc jars, and the license, developers and SCM sections in the POM. A release is uploaded with `mvn clean deploy`, validated by the portal, and then published manually from **Deployments**. Once published, a release cannot be changed or deleted.
+After the previous steps, continue with the following steps:
+
+### 1. Create a GPG key (once per computer)
+
+Create an RSA key:
+```
+gpg --full-generate-key
+```
+
+Extract the fingerprint:
+```
+gpg --list-secret-keys --keyid-format short
+```
+
+Publish the public key, using the fingerprint shown under the `sec` line. 
+```
+gpg --keyserver hkps://keyserver.ubuntu.com:443 --send-keys FINGERPRINT
+```
+
+This may fail! Then try extracting your public key first:
+```
+gpg --armor --export FINGERPRINT > public-key.asc
+```
+
+ Then paste the file content at https://keyserver.ubuntu.com (**Submit Key**). 
+ 
+ To verify that the key is published:
+
+```
+curl -s "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xFINGERPRINT" | gpg --show-keys
+```
+
+### 2. Required files and POM metadata
+
+These are already in the repository.
+
+- Create the `LICENSE` (Apache License 2.0) and `NOTICE` files in the root folder.
+- Complete the `url`, `licenses`, `developers` and `scm` sections in the root `pom.xml`:
+
+```xml
+<url>https://github.com/dissys/vpr-data</url>
+
+<licenses>
+    <license>
+        <name>Apache License, Version 2.0</name>
+        <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        <distribution>repo</distribution>
+    </license>
+</licenses>
+
+<developers>
+    <developer>
+        <name>Goksel Misirli</name>
+        <url>https://github.com/dissys</url>
+    </developer>
+</developers>
+
+<scm>
+    <url>https://github.com/dissys/vpr-data</url>
+    <connection>scm:git:https://github.com/dissys/vpr-data.git</connection>
+    <developerConnection>scm:git:git@github.com:dissys/vpr-data.git</developerConnection>
+</scm>
+```
+
+- Add a `release` profile in the root `pom.xml` to build:
+  *  build `-sources.jar` (`maven-source-plugin`)
+  *  build `-javadoc.jar` (`maven-javadoc-plugin`)
+  *  sign all files (`maven-gpg-plugin`)
+  
+- Double check the creation of Javadoc locally:  
+```
+mvn compile javadoc:javadoc
+```
+and check the outputs:  `target/reports/apidocs/index.html`.
+
+- Check if the release builds without GPG signing:
+
+```
+mvn clean verify -P release -DskipTests -Dgpg.skip
+```
+
+### 3. Deploy the release
+
+With git flow, prepare the release on the release branch (for example version 2.0.18):
+
+Update the release version:
+```
+mvn versions:set -DnewVersion=2.0.18 -DgenerateBackupPoms=false
+```
+
+Finally, deploy.
+If using MacOS, 
+```
+mvn clean deploy -P release -DskipTests
+```
+
+If you receive the "Inappropriate ioctl for device" error then type the following and try deploying again. This happens when GPG is unable to ask for the GPG passphrase. As a Mac user, i had this error!
+
+```
+export GPG_TTY=$(tty)
+mvn clean deploy -P release -DskipTests
+```
+
+This will upload to Maven Central (`Deployments` at https://central.sonatype.com) due to having the `autoPublish` parameter set to `false`. Go to your Account and select "View Deployments".
+
+ When the status becomes ``Validated``, click ``Publish``. The release should be available on Maven Central, at https://repo1.maven.org/maven2/org/virtualparts/virtualparts-data/.
+
+ This took 11 minutes for me!!!
+
+### 4. Finish the release
+Do not forget to finish the release. I use git flow, so:
+```
+git flow release finish 2.0.18
+git push origin main develop --tags
+```

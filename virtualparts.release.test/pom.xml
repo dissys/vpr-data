@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Standalone project that checks a vpr-data release on Maven Central. It has no parent POM and is
+  not a module of the vpr-data build, so it resolves vpr-data exactly as an external user would.
+
+  Run from this folder:
+    mvn -U test
+  To test as a new user, with an empty local repository:
+    mvn -U test -Dmaven.repo.local=/tmp/m2-release-test
+  To test another version:
+    mvn -U test -Dvpr-data.version=2.0.19
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.virtualparts.test</groupId>
+    <artifactId>virtualparts-release-test</artifactId>
+    <version>1.0</version>
+
+    <name>virtualparts-release-test</name>
+    <description>Checks that a vpr-data release on Maven Central can be used as a dependency</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>23</maven.compiler.release>
+        <vpr-data.version>2.0.18</vpr-data.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.virtualparts</groupId>
+            <artifactId>virtualparts-data</artifactId>
+            <version>${vpr-data.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.16.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.2</version>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

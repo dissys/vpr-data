@@ -207,6 +207,12 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.11.2</version>
+                    <configuration>
+                        <!-- Report Javadoc problems as warnings instead of failing the build -->
+                        <doclint>none</doclint>
+                        <failOnError>false</failOnError>
+                        <quiet>true</quiet>
+                    </configuration>
                 </plugin>
 
             </plugins>
@@ -248,12 +254,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <!-- Report Javadoc problems as warnings instead of failing the release -->
-                            <doclint>none</doclint>
-                            <failOnError>false</failOnError>
-                            <quiet>true</quiet>
-                        </configuration>
+                        <!-- Configured in pluginManagement above -->
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
