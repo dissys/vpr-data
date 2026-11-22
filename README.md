@@ -1,6 +1,20 @@
 # Usage
 
-Update your project's POM file as follows to use a SNAPSHOT version.
+The vpr-data releases are available from [Maven Central](https://central.sonatype.com/artifact/org.virtualparts/virtualparts-data) (or [MvnRepository](https://mvnrepository.com/artifact/org.virtualparts/virtualparts-data)). To use vpr-data add the following dependency to your project's POM file:
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.virtualparts</groupId>
+        <artifactId>virtualparts-data</artifactId>
+        <version>2.0.18</version>
+    </dependency>
+</dependencies>
+```
+
+## SNAPSHOT versions
+
+SNAPSHOT versions are for testing and available from the snapshot repository for 90 days. To use SNAPSHOT version, add the snapshot repository and use the appropriate version wih the `-SNAPSHOT` suffix:
 
 ```xml
 <repositories>
