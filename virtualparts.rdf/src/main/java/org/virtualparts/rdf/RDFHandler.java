@@ -434,12 +434,12 @@ public class RDFHandler {
 	  
 	    /**
 	     * Gets the  property values for a given property and a resource.
-	     * @param model Model to search the property for
-	     * @param resource Resource to search the property values for 
+	     * @param rdfModel Model to search the property for
+	     * @param resource Resource to search the property values for
 	     * @param propertyURI the URI of the property
 	     * @return List of String objects with the corresponding values
 	     */
-	    public static List<String> getPropertyValues(Model rdfModel, Resource resource, URI propertyURI) 
+	    public static List<String> getPropertyValues(Model rdfModel, Resource resource, URI propertyURI)
 	    {
 	        ArrayList<String> values=new ArrayList<String>();
 	        Property property=rdfModel.getProperty(propertyURI.toString());
@@ -465,8 +465,8 @@ public class RDFHandler {
 	    
 	    /**
 	     * Gets the  property values for a given property and a resource.
-	     * @param model Model to search the property for
-	     * @param resource Resource to search the property values for 
+	     * @param rdfModel Model to search the property for
+	     * @param resource Resource to search the property values for
 	     * @param propertyURI the URI of the property
 	     * @return List of Resource objects with the corresponding values
 	     */
