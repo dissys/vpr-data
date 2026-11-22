@@ -10,3 +10,5 @@ bin
 .sbml
 jcs_swap
 *DS_Store
+dependency-reduced-pom.xml
+*.versionsBackup

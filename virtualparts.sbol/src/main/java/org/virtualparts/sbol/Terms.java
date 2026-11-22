@@ -6,6 +6,7 @@ import java.net.URI;
 
 import javax.xml.namespace.QName;
 
+
 import org.sbolstandard.core2.SystemsBiologyOntology;
 
 import org.sbolstandard.core.datatree.NamespaceBinding;
@@ -40,6 +41,10 @@ public class Terms {
 
 	public static final class sbo {
 		public static final NamespaceBinding Ns = NamespaceBinding("http://identifiers.org/biomodels.sbo/", "sbo");
+	}
+	
+	public static final class prov {
+		public static final NamespaceBinding Ns = NamespaceBinding("http://www.w3.org/ns/prov#", "prov");
 	}
 	
 
