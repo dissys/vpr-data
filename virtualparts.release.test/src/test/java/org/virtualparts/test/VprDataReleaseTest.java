@@ -26,7 +26,7 @@ public class VprDataReleaseTest {
     // Two inverters as a single flat design: promoter, RBS, CDS and terminator parts from the bsu collection
     private static final String DESIGN = "BO_27661:prom;BO_27783:rbs;BO_32077:cds;BO_4257:ter;" + "BO_27632:prom;BO_27783:rbs;BO_31554:cds;BO_4257:ter";
 
-    /** Checks that the classes come from the released vpr-data jar. */
+    /** Checks that the classes come from the released jar. */
     @Test
     public void usesReleasedJar() {
         String location = SBOLInteractionAdder_GeneCentric.class.getProtectionDomain().getCodeSource().getLocation().toString();
